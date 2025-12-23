@@ -19,7 +19,16 @@ class ROADYOLODataset(YOLODataset):
         self.lb_class_id = lb_class_id
         self.lb_id_class = lb_id_class
         self.lb_id_class_norm = lb_id_class_norm
-        super().__init__(*args, data=data, use_segments=use_segments, use_keypoints=use_keypoints, **kwargs)
+
+        # Ultralytics >=8.2.0 removed use_segments/use_keypoints init kwargs in favor of a single `task` argument.
+        # Derive the task from the provided flags when an explicit task is not supplied for compatibility.
+        task = kwargs.pop('task', None)
+        if task is None:
+            if use_segments and use_keypoints:
+                raise ValueError("use_segments and use_keypoints are mutually exclusive")
+            task = 'segment' if use_segments else 'pose' if use_keypoints else 'detect'
+
+        super().__init__(*args, data=data, task=task, **kwargs)
 
     def get_labels(self):
         """Returns dictionary of labels for YOLO training."""
@@ -94,8 +103,9 @@ class ROADYOLODataset(YOLODataset):
             pbar = TQDM(results, desc=desc, total=total)
             for im_file, lb, shape, segments, keypoint, nm_f, nf_f, ne_f, nc_f, msg, lb_class in pbar:
                 if msg != '':
-                    print(msg)
-                    exit()
+                    # Skip corrupt entries but keep scanning the rest of the dataset.
+                    LOGGER.warning(msg)
+                    continue
                 nm += nm_f
                 nf += nf_f
                 ne += ne_f
