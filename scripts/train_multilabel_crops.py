@@ -21,6 +21,8 @@ def parse_args():
     parser.add_argument("--optimizer", default="SGD", choices=["SGD", "Adam", "AdamW"], help="Optimizer type.")
     parser.add_argument("--workers", type=int, default=8, help="DataLoader workers.")
     parser.add_argument("--use-constraints", action="store_true", help="Enable constraint loss (requires YOLO/constraints.npy).")
+    parser.add_argument("--patience", type=int, default=100, help="Early stopping patience (epochs).")
+    parser.add_argument("--save-period", type=int, default=50, help="Checkpoint save period (epochs).")
     return parser.parse_args()
 
 
@@ -41,6 +43,8 @@ def main():
         "lr0": args.lr0,
         "imgsz": args.imgsz,
         "workers": args.workers,
+        "patience": args.patience,
+        "save_period": args.save_period,
         # Light augmentations for 224px person crops
         "hsv_h": 0.012, "hsv_s": 0.5, "hsv_v": 0.4,   # mild color jitter to keep skin/cloth tones realistic
         "degrees": 2.5, "translate": 0.04, "scale": 0.2, "shear": 1.0,  # gentle geo jitter; scale limited because box spans crop

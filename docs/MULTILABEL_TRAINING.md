@@ -62,6 +62,8 @@ overrides = {
     "optimizer": "SGD",
     "lr0": 0.002,
     "imgsz": 224,                     # cropped-person inputs
+    "patience": 100,                  # early stopping patience (epochs)
+    "save_period": 50,                # save checkpoint every 50 epochs
     # Light augmentations for person crops (full-image box):
     "hsv_h": 0.012, "hsv_s": 0.5, "hsv_v": 0.4,  # mild color jitter to keep tones realistic
     "degrees": 2.5, "translate": 0.04, "scale": 0.2, "shear": 1.0,  # gentle geo jitter; box spans crop
@@ -150,6 +152,8 @@ Two ready-to-run scripts are included for the 5-class, cropped-person setup:
      --epochs 80 \
      --batch 32 \
      --imgsz 224 \
+     --patience 100 \
+     --save-period 50 \
      --use-constraints  # optional: enable if YOLO/constraints.npy is prepared
    ```
    This uses light augmentations tuned for person crops and keeps the bounding box as the full crop.
@@ -159,6 +163,7 @@ Two ready-to-run scripts are included for the 5-class, cropped-person setup:
    - **Geometry**: mild rotation/translate/scale (2.5°, 0.04, 0.2) since each crop is already aligned to one person; box covers the whole crop.
    - **Mixing**: Mosaic at 0.5 for more spatial variety; MixUp/Copy-Paste off to avoid unrealistic blends for single-person crops.
    - **Schedule**: `close_mosaic` ≈ last quarter of training (20 when epochs=80) to stabilize later epochs.
+   - **Checkpoints/Early stop**: `save_period=50` saves checkpoints every 50 epochs; `patience=100` halts if validation fitness doesn’t improve for 100 epochs.
 
 2. **Predict** (images or folder)  
    ```bash
