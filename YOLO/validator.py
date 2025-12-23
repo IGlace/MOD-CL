@@ -2,7 +2,7 @@ from ultralytics.models.yolo.detect import DetectionValidator
 from ultralytics.utils import ops, LOGGER, TQDM, callbacks, colorstr, emojis
 from pathlib import Path
 from ultralytics.nn.autobackend import AutoBackend
-from ultralytics.utils.torch_utils import de_parallel, select_device, smart_inference_mode
+from ultralytics.utils.torch_utils import select_device, smart_inference_mode
 from ultralytics.utils.checks import check_imgsz
 from ultralytics.data.utils import check_cls_dataset, check_det_dataset
 from ultralytics.utils.ops import Profile
