@@ -212,6 +212,11 @@ class ROADYOLODataset(YOLODataset):
         keypoints = label.pop('keypoints', None)
         bbox_format = label.pop('bbox_format')
         normalized = label.pop('normalized')
+        # Ensure segments are always a NumPy array to satisfy downstream augmentations.
+        if segments:
+            segments = np.stack(segments, axis=0).astype(np.float32)
+        else:
+            segments = np.zeros((0, 0, 2), dtype=np.float32)
         label['instances'] = Instances(bboxes, segments, keypoints, bbox_format=bbox_format, normalized=normalized)
         return label
 
