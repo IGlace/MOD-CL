@@ -1,5 +1,5 @@
 from ultralytics.models.yolo.detect import DetectionTrainer
-from ultralytics.utils.torch_utils import de_parallel
+from ultralytics.utils.torch_utils import unwrap_model
 from ultralytics.utils.plotting import plot_labels
 from ultralytics.utils import DEFAULT_CFG, RANK, colorstr, LOGGER, TQDM
 from ultralytics.nn.tasks import DetectionModel
@@ -25,7 +25,7 @@ class YOLOTrainer(DetectionTrainer):
         self.req_loss = req_loss
     
     def build_dataset(self, img_path, mode='train', batch=None):
-        gs = max(int(de_parallel(self.model).stride.max() if self.model else 0), 32)
+        gs = max(int(unwrap_model(self.model).stride.max() if self.model else 0), 32)
         dataset = build_yolo_dataset(self.args, img_path, batch, self.data, mode=mode, rect=mode == 'val', stride=gs, lb_class_id=self.model.lb_class_id, lb_id_class=self.model.lb_id_class, lb_id_class_norm=self.model.lb_id_class_norm)
         self.model.lb_class_id = dataset.lb_class_id
         self.model.lb_id_class = dataset.lb_id_class
